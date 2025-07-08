@@ -1,7 +1,9 @@
+import 'reflect-metadata';
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import todoRoutes from './routes/todoRoutes';
+import AppDataSource from './database/dataSource';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -33,7 +35,21 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
   res.status(500).json({ success: false, error: 'Something went wrong!' });
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Todo app server running on port ${PORT}`);
-  console.log(`📱 Access the app at: http://localhost:${PORT}`);
-});
+// Initialize database and start server
+async function startServer() {
+  try {
+    console.log('🔌 Connecting to database...');
+    await AppDataSource.initialize();
+    console.log('✅ Database connected successfully');
+    
+    app.listen(PORT, () => {
+      console.log(`🚀 Todo app server running on port ${PORT}`);
+      console.log(`📱 Access the app at: http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error('❌ Error during Data Source initialization:', error);
+    process.exit(1);
+  }
+}
+
+startServer();

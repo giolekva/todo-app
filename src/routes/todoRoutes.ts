@@ -5,15 +5,16 @@ import { CreateTodoRequest, UpdateTodoRequest, ApiResponse } from '../types';
 const router = Router();
 
 // GET /api/todos - Get all todos
-router.get('/', (req: Request, res: Response) => {
+router.get('/', async (req: Request, res: Response) => {
   try {
-    const todos = todoService.getAllTodos();
+    const todos = await todoService.getAllTodos();
     const response: ApiResponse<typeof todos> = {
       success: true,
       data: todos
     };
     res.json(response);
   } catch (error) {
+    console.error('Error fetching todos:', error);
     const response: ApiResponse<null> = {
       success: false,
       error: 'Failed to fetch todos'
@@ -23,9 +24,9 @@ router.get('/', (req: Request, res: Response) => {
 });
 
 // GET /api/todos/:id - Get todo by ID
-router.get('/:id', (req: Request, res: Response) => {
+router.get('/:id', async (req: Request, res: Response) => {
   try {
-    const todo = todoService.getTodoById(req.params.id);
+    const todo = await todoService.getTodoById(req.params.id);
     if (!todo) {
       const response: ApiResponse<null> = {
         success: false,
@@ -40,6 +41,7 @@ router.get('/:id', (req: Request, res: Response) => {
     };
     res.json(response);
   } catch (error) {
+    console.error('Error fetching todo:', error);
     const response: ApiResponse<null> = {
       success: false,
       error: 'Failed to fetch todo'
@@ -49,7 +51,7 @@ router.get('/:id', (req: Request, res: Response) => {
 });
 
 // POST /api/todos - Create new todo
-router.post('/', (req: Request, res: Response) => {
+router.post('/', async (req: Request, res: Response) => {
   try {
     const createRequest: CreateTodoRequest = req.body;
     
@@ -61,13 +63,14 @@ router.post('/', (req: Request, res: Response) => {
       return res.status(400).json(response);
     }
     
-    const todo = todoService.createTodo(createRequest);
+    const todo = await todoService.createTodo(createRequest);
     const response: ApiResponse<typeof todo> = {
       success: true,
       data: todo
     };
     res.status(201).json(response);
   } catch (error) {
+    console.error('Error creating todo:', error);
     const response: ApiResponse<null> = {
       success: false,
       error: 'Failed to create todo'
@@ -77,10 +80,10 @@ router.post('/', (req: Request, res: Response) => {
 });
 
 // PUT /api/todos/:id - Update todo
-router.put('/:id', (req: Request, res: Response) => {
+router.put('/:id', async (req: Request, res: Response) => {
   try {
     const updateRequest: UpdateTodoRequest = req.body;
-    const todo = todoService.updateTodo(req.params.id, updateRequest);
+    const todo = await todoService.updateTodo(req.params.id, updateRequest);
     
     if (!todo) {
       const response: ApiResponse<null> = {
@@ -96,6 +99,7 @@ router.put('/:id', (req: Request, res: Response) => {
     };
     res.json(response);
   } catch (error) {
+    console.error('Error updating todo:', error);
     const response: ApiResponse<null> = {
       success: false,
       error: 'Failed to update todo'
@@ -105,9 +109,9 @@ router.put('/:id', (req: Request, res: Response) => {
 });
 
 // DELETE /api/todos/:id - Delete todo
-router.delete('/:id', (req: Request, res: Response) => {
+router.delete('/:id', async (req: Request, res: Response) => {
   try {
-    const success = todoService.deleteTodo(req.params.id);
+    const success = await todoService.deleteTodo(req.params.id);
     
     if (!success) {
       const response: ApiResponse<null> = {
@@ -122,6 +126,7 @@ router.delete('/:id', (req: Request, res: Response) => {
     };
     res.json(response);
   } catch (error) {
+    console.error('Error deleting todo:', error);
     const response: ApiResponse<null> = {
       success: false,
       error: 'Failed to delete todo'

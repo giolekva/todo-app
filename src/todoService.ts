@@ -1,34 +1,41 @@
-import { v4 as uuidv4 } from 'uuid';
-import { Todo, CreateTodoRequest, UpdateTodoRequest } from './types';
+import { Repository } from 'typeorm';
+import { Todo } from './entities/Todo';
+import { CreateTodoRequest, UpdateTodoRequest } from './types';
+import AppDataSource from './database/dataSource';
 
 class TodoService {
-  private todos: Todo[] = [];
+  private todoRepository: Repository<Todo>;
 
-  getAllTodos(): Todo[] {
-    return this.todos.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  constructor() {
+    this.todoRepository = AppDataSource.getRepository(Todo);
   }
 
-  getTodoById(id: string): Todo | undefined {
-    return this.todos.find(todo => todo.id === id);
+  async getAllTodos(): Promise<Todo[]> {
+    return await this.todoRepository.find({
+      order: {
+        createdAt: 'DESC'
+      }
+    });
   }
 
-  createTodo(request: CreateTodoRequest): Todo {
-    const now = new Date();
-    const todo: Todo = {
-      id: uuidv4(),
+  async getTodoById(id: string): Promise<Todo | null> {
+    return await this.todoRepository.findOne({
+      where: { id }
+    });
+  }
+
+  async createTodo(request: CreateTodoRequest): Promise<Todo> {
+    const todo = this.todoRepository.create({
       title: request.title,
       description: request.description,
-      completed: false,
-      createdAt: now,
-      updatedAt: now
-    };
+      completed: false
+    });
     
-    this.todos.push(todo);
-    return todo;
+    return await this.todoRepository.save(todo);
   }
 
-  updateTodo(id: string, request: UpdateTodoRequest): Todo | null {
-    const todo = this.getTodoById(id);
+  async updateTodo(id: string, request: UpdateTodoRequest): Promise<Todo | null> {
+    const todo = await this.getTodoById(id);
     if (!todo) {
       return null;
     }
@@ -43,26 +50,30 @@ class TodoService {
       todo.completed = request.completed;
     }
     
-    todo.updatedAt = new Date();
-    return todo;
+    return await this.todoRepository.save(todo);
   }
 
-  deleteTodo(id: string): boolean {
-    const index = this.todos.findIndex(todo => todo.id === id);
-    if (index === -1) {
-      return false;
-    }
-    
-    this.todos.splice(index, 1);
-    return true;
+  async deleteTodo(id: string): Promise<boolean> {
+    const result = await this.todoRepository.delete(id);
+    return (result.affected ?? 0) > 0;
   }
 
-  getCompletedTodos(): Todo[] {
-    return this.todos.filter(todo => todo.completed);
+  async getCompletedTodos(): Promise<Todo[]> {
+    return await this.todoRepository.find({
+      where: { completed: true },
+      order: {
+        createdAt: 'DESC'
+      }
+    });
   }
 
-  getPendingTodos(): Todo[] {
-    return this.todos.filter(todo => !todo.completed);
+  async getPendingTodos(): Promise<Todo[]> {
+    return await this.todoRepository.find({
+      where: { completed: false },
+      order: {
+        createdAt: 'DESC'
+      }
+    });
   }
 }
 

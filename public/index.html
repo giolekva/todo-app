@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo App</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📝 Todo App</h1>
+            <div class="stats">
+                <span id="total-count">0</span> total,
+                <span id="completed-count">0</span> completed,
+                <span id="pending-count">0</span> pending
+            </div>
+        </header>
+
+        <main>
+            <!-- Add Todo Form -->
+            <section class="add-todo-section">
+                <h2>Add New Todo</h2>
+                <form id="todo-form">
+                    <div class="form-group">
+                        <label for="todo-title">Title:</label>
+                        <input type="text" id="todo-title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="todo-description">Description:</label>
+                        <textarea id="todo-description" rows="3" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Todo</button>
+                </form>
+            </section>
+
+            <!-- Filter Controls -->
+            <section class="filter-section">
+                <h2>Filter Todos</h2>
+                <div class="filter-controls">
+                    <button class="btn btn-secondary filter-btn active" data-filter="all">All</button>
+                    <button class="btn btn-secondary filter-btn" data-filter="pending">Pending</button>
+                    <button class="btn btn-secondary filter-btn" data-filter="completed">Completed</button>
+                </div>
+            </section>
+
+            <!-- Todos List -->
+            <section class="todos-section">
+                <h2>Your Todos</h2>
+                <div id="loading" class="loading">Loading...</div>
+                <div id="error" class="error" style="display: none;"></div>
+                <div id="todos-list" class="todos-list"></div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Todo</h3>
+                <button class="close-btn" onclick="closeEditModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-form">
+                    <div class="form-group">
+                        <label for="edit-title">Title:</label>
+                        <input type="text" id="edit-title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-description">Description:</label>
+                        <textarea id="edit-description" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="edit-completed"> Completed
+                        </label>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
